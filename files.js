@@ -1,3 +1,5 @@
+const files = [];
+
 export function listFiles() {
   const guide = new File(
     [
@@ -89,6 +91,16 @@ export default initialValue => {
       lastModified: new Date('2011-07-29T16:01:35')
     }
   );
+  console.log("LIST FILES IS CALLED");
+  files.push(guide, plain, water, fancy, javascript, json);
+  // return [guide, plain, water, fancy, javascript, json];
+  return files;
+}
 
-  return [guide, plain, water, fancy, javascript, json];
+export function updateFile( updatedFile ) {
+  for (var i = 0; i < files.length; i++) {
+    if (files[i].name === updatedFile.name) {
+      files[i] = updatedFile;
+    }
+  }
 }

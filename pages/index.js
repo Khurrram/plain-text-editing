@@ -4,8 +4,6 @@ import PropTypes from 'prop-types';
 import path from 'path';
 import classNames from 'classnames';
 
-import { listFiles } from '../files';
-
 // Used below, these need to be registered
 import MarkdownEditor from '../MarkdownEditor';
 import PlaintextEditor from '../components/PlaintextEditor';
@@ -16,6 +14,7 @@ import IconJavaScriptSVG from '../public/icon-javascript.svg';
 import IconJSONSVG from '../public/icon-json.svg';
 
 import css from './style.module.css';
+import { saveFile } from '../components/saveFile';
 
 const TYPE_TO_ICON = {
   'text/plain': IconPlaintextSVG,
@@ -77,7 +76,7 @@ FilesTable.propTypes = {
 };
 
 function Previewer({ file }) {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState();
 
   useEffect(() => {
     (async () => {
@@ -99,23 +98,63 @@ Previewer.propTypes = {
 
 // Uncomment keys to register editors for media types
 const REGISTERED_EDITORS = {
-  // "text/plain": PlaintextEditor,
-  // "text/markdown": MarkdownEditor,
+  "text/plain": PlaintextEditor,
+  "text/markdown": MarkdownEditor
 };
+
+//converts response from backend into a File array so it can be used by other components
+//used by UseEffect + saveFile import function
+function getFilesArr( resFiles ) {
+  let filesArr = [];
+  resFiles.forEach(function(file) {
+    filesArr.push(
+        new File([
+            file.text.replace(/\\n/g, '\n')
+        ], 
+        file.name,
+        {
+            type: file.type,
+            lastModified: new Date(file.lastModifiedDate)
+        }
+        )
+    )
+})
+return filesArr;
+}
+
+//used by saveFile import function in order to reload files after saving, also uses setFiles to set files
+function getFiles(setFiles) {
+  fetch("http://localhost:3001/api/getFiles", {
+      method: "POST",
+      headers : {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => res.json())
+      .then((res) => setFiles(getFilesArr(res)))
+      .catch(error => console.log(error));
+}
 
 function PlaintextFilesChallenge() {
   const [files, setFiles] = useState([]);
   const [activeFile, setActiveFile] = useState(null);
 
+  //useEffect is only called once, only rerenders on state updates after initial rendering
   useEffect(() => {
-    const files = listFiles();
-    setFiles(files);
+    fetch("http://localhost:3001/api/getFiles", {
+      method: "POST",
+      headers : {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => res.json())
+      .then((res) => setFiles(getFilesArr(res)))
+      .catch(error => console.log(error));
   }, []);
 
   const write = file => {
     console.log('Writing soon... ', file.name);
-
-    // TODO: Write the file to the `files` array
+    saveFile(file, getFiles, setFiles);
   };
 
   const Editor = activeFile ? REGISTERED_EDITORS[activeFile.type] : null;
@@ -140,9 +179,7 @@ function PlaintextFilesChallenge() {
           activeFile={activeFile}
           setActiveFile={setActiveFile}
         />
-
         <div style={{ flex: 1 }}></div>
-
         <footer>
           <div className={css.link}>
             <a href="https://v3.rethink.software/jobs">Rethink Software</a>
@@ -166,6 +203,7 @@ function PlaintextFilesChallenge() {
           <div className={css.empty}>Select a file to view or edit</div>
         )}
       </main>
+
     </div>
   );
 }
