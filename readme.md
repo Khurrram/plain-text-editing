@@ -1,14 +1,22 @@
 # Rethink Plaintext Editing
 
-This is our frontend coding challenge. It gives us a chance to see your abilities and how you approach problems. It is designed to give you unlimited creative freedom as you develop a solution. Feel free to use any packages/tools/etc. you'd like to edit text as elegantly as possible. There are a variety of different file types to experiment with as you see fit.
+Hello! This is my response to the challenge.
+
+Here are some new features:
+- Plain Text Editing on ALL .txt files, increased box size + auto overflow
+- Real Time Markdown Editing, where two boxes are given, one of which is labeled Editor and other Preview. As you enter new markdown into the editor section, the Preview section simultaneously updates!
+- MongoDB functionality: I added MongoDB Atlas to the backend! Now all files will persist through reloads/different active files!
+
+Here are some updates for the future (aka if I had more time):
+- Ability to add new documents.
+- Ability to rename documents.
+- Ability to upload images.
+- Code preview?
 
 To run the challenge:
 
 - FORK this repo
 - Download forked repo and run `npm install && npm run dev`
 - Open `localhost:3000` in your browser
-- Enjoy
-
-Once complete, please email us a link to your forked repo with clean, tested code.
-- Email fork link to: careers@rethink.software or your current contact
-- We will use Chrome to run it
+- Change MongoDB config in server/config/db.config.js to your own mongodb atlas, input some raw data through atlas 
+- Enjoy!
